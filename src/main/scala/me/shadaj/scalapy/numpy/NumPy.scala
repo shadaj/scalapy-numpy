@@ -21,4 +21,8 @@ class NumPy(o: py.Object)(implicit jep: Jep) extends ObjectFascade(o) {
   def random: NumPyRandom = dynamic.random.as[NumPyRandom]
 
   def float32: NumPyType = dynamic.float32.as[NumPyType]
+
+  def clip[T](value: NDArray[T], low: NDArray[T], high: NDArray[T])(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[T] = {
+    dynamic.clip(value, low, high).as[NDArray[T]]
+  }
 }

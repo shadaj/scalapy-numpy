@@ -1,28 +1,39 @@
 package me.shadaj.scalapy.numpy
 
 import jep.Jep
-
 import me.shadaj.scalapy.py
-import me.shadaj.scalapy.py.{ObjectFascade, ObjectReader, ObjectWriter}
+import me.shadaj.scalapy.py.{ObjectFacade, ObjectReader, ObjectWriter}
 
-class NumPy(o: py.Object)(implicit jep: Jep) extends ObjectFascade(o) {
-  def asarray[T](s: Seq[T])(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[T] = {
-    dynamic.asarray(s).as[NDArray[T]]
+import scala.reflect.ClassTag
+
+class NumPy(o: py.Object)(implicit jep: Jep) extends ObjectFacade(o) {
+  def asarray[T: ClassTag](s: Seq[T])(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[T] = {
+    toDynamic.asarray(s).as[NDArray[T]]
   }
 
-  def resize[T](s: Seq[T], shape: (Int, Int))(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[NDArray[Double]] = {
-    dynamic.resize(s, shape).as[NDArray[NDArray[Double]]]
+  def matrix[T: ClassTag](s: Seq[T])(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[T] = {
+    toDynamic.matrix(s).as[NDArray[T]]
+  }
+
+  def resize[T: ClassTag](s: Seq[T], shape: (Int, Int))(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[NDArray[Double]] = {
+    toDynamic.resize(s, shape).as[NDArray[NDArray[Double]]]
   }
 
   def ones(size: Int): NDArray[Double] = {
-    dynamic.ones(size).as[NDArray[Double]]
+    native
   }
 
-  def random: NumPyRandom = dynamic.random.as[NumPyRandom]
+  def zeroes(size: Int): NDArray[Double] = {
+    native
+  }
 
-  def float32: NumPyType = dynamic.float32.as[NumPyType]
+  def random: NumPyRandom = native
+
+  def float32: NumPyType = native
+
+  def linalg: NumPyLinalg = native
 
   def clip[T](value: NDArray[T], low: NDArray[T], high: NDArray[T])(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[T] = {
-    dynamic.clip(value, low, high).as[NDArray[T]]
+    toDynamic.clip(value, low, high).as[NDArray[T]]
   }
 }

@@ -2,13 +2,10 @@ organization := "me.shadaj"
 
 name := "scalapy-numpy"
 
-version := "0.1.0-SNAPSHOT"
+scalaVersion := "2.12.6"
 
-scalaVersion := "2.12.1"
+fork in Test := true
 
-fork in runMain := true
+javaOptions in Test += "-Djava.library.path=/usr/local/lib/python3.6/site-packages/jep"
 
-javaOptions in Test += "-Djava.library.path=./lib/"
-javaOptions in runMain += "-Djava.library.path=./lib/"
-
-libraryDependencies += "me.shadaj" %% "scalapy" % "0.1.0-SNAPSHOT"
+libraryDependencies += "me.shadaj" %% "scalapy" % "2355a3e0"

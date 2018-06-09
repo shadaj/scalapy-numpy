@@ -7,7 +7,7 @@ publishArtifact in Test in ThisBuild := false
 publishTo in ThisBuild := Some(Opts.resolver.sonatypeStaging)
 
 pomExtra in ThisBuild :=
-  <url>https://github.com/shadaj/slinky</url>
+  <url>https://github.com/shadaj/scalapy-numpy</url>
     <licenses>
       <license>
         <name>MIT</name>
@@ -16,8 +16,8 @@ pomExtra in ThisBuild :=
       </license>
     </licenses>
     <scm>
-      <url>https://github.com/shadaj/slinky.git</url>
-      <connection>https://github.com/shadaj/slinky.git</connection>
+      <url>https://github.com/shadaj/scalapy-numpy.git</url>
+      <connection>https://github.com/shadaj/scalapy-numpy.git</connection>
     </scm>
     <developers>
       <developer>

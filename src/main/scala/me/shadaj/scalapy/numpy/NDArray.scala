@@ -1,31 +1,32 @@
 package me.shadaj.scalapy.numpy
 
-import jep.Jep
 import me.shadaj.scalapy.py
-import me.shadaj.scalapy.py.{ObjectReader, ObjectWriter, ValueAndRequestObject}
+import me.shadaj.scalapy.py.{PyValue, Reader, Writer, ValueAndRequestRef}
 
-class NDArray[T](orig: py.Object)(implicit reader: ObjectReader[T], jep: Jep) extends py.Object(orig.variableId) with Seq[T] {
-  private val origDynamic = orig.asInstanceOf[py.DynamicObject]
+class NDArray[T](val value: PyValue)(implicit reader: Reader[T]) extends py.Object with Seq[T] {
+  private val origDynamic = this.as[py.Dynamic]
+
+  def tolist: py.Any = origDynamic.tolist()
 
   def unary_-(): NDArray[T] = (-origDynamic).as[NDArray[T]]
 
-  def +(o: T)(implicit writer: ObjectWriter[T]): NDArray[T] = (origDynamic + o).as[NDArray[T]]
-  def +(o: NDArray[T])(implicit writer: ObjectWriter[NDArray[T]]): NDArray[T] = (origDynamic + o).as[NDArray[T]]
+  def +(o: T)(implicit writer: Writer[T]): NDArray[T] = (origDynamic + o).as[NDArray[T]]
+  def +(o: NDArray[T])(implicit writer: Writer[NDArray[T]]): NDArray[T] = (origDynamic + o).as[NDArray[T]]
 
-  def -(o: T)(implicit writer: ObjectWriter[T]): NDArray[T] = (origDynamic - o).as[NDArray[T]]
-  def -(o: NDArray[T])(implicit writer: ObjectWriter[NDArray[T]]): NDArray[T] = (origDynamic - o).as[NDArray[T]]
+  def -(o: T)(implicit writer: Writer[T]): NDArray[T] = (origDynamic - o).as[NDArray[T]]
+  def -(o: NDArray[T])(implicit writer: Writer[NDArray[T]]): NDArray[T] = (origDynamic - o).as[NDArray[T]]
 
-  def *(o: T)(implicit writer: ObjectWriter[T]): NDArray[T] = (origDynamic * o).as[NDArray[T]]
-  def *(o: NDArray[T])(implicit writer: ObjectWriter[NDArray[T]]): NDArray[T] = (origDynamic * o).as[NDArray[T]]
+  def *(o: T)(implicit writer: Writer[T]): NDArray[T] = (origDynamic * o).as[NDArray[T]]
+  def *(o: NDArray[T])(implicit writer: Writer[NDArray[T]]): NDArray[T] = (origDynamic * o).as[NDArray[T]]
 
-  def /(o: T)(implicit writer: ObjectWriter[T]): NDArray[T] = (origDynamic / o).as[NDArray[T]]
-  def /(o: NDArray[T])(implicit writer: ObjectWriter[NDArray[T]]): NDArray[T] = (origDynamic / o).as[NDArray[T]]
+  def /(o: T)(implicit writer: Writer[T]): NDArray[T] = (origDynamic / o).as[NDArray[T]]
+  def /(o: NDArray[T])(implicit writer: Writer[NDArray[T]]): NDArray[T] = (origDynamic / o).as[NDArray[T]]
 
-  def T(implicit writer: ObjectWriter[T]): NDArray[T] = origDynamic.T.as[NDArray[T]]
+  def T(implicit writer: Writer[T]): NDArray[T] = origDynamic.T.as[NDArray[T]]
 
   def astype(newType: NumPyType): NDArray[T] = origDynamic.astype(newType).as[NDArray[T]]
 
-  override def length: Int = py.global.len(orig).as[Int]
+  override def length: Int = py.global.len(this).as[Int]
 
   override def apply(idx: Int): T = origDynamic.arrayAccess(idx).as[T]
 
@@ -33,7 +34,7 @@ class NDArray[T](orig: py.Object)(implicit reader: ObjectReader[T], jep: Jep) ex
 }
 
 object NDArray {
-  implicit def seqReader[T](implicit reader: ObjectReader[T]): ObjectReader[NDArray[T]] = new ObjectReader[NDArray[T]] {
-    override def read(r: ValueAndRequestObject)(implicit jep: Jep): NDArray[T] = new NDArray[T](r.requestObject)(reader, jep)
+  implicit def reader[T](implicit reader: Reader[T]): Reader[NDArray[T]] = new Reader[NDArray[T]] {
+    override def read(r: ValueAndRequestRef): NDArray[T] = new NDArray[T](r.value)(reader)
   }
 }

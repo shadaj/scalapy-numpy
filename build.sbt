@@ -1,11 +1,47 @@
-organization := "me.shadaj"
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-name := "scalapy-numpy"
+organization in ThisBuild := "me.shadaj"
 
-scalaVersion := "2.12.6"
+scalaVersion in ThisBuild := "2.12.8"
 
-fork in Test := true
+addCommandAlias(
+  "publishSignedAll",
+  (scalaPyNumpy: ProjectDefinition[ProjectReference])
+    .aggregate
+    .map(p => s"+ ${p.asInstanceOf[LocalProject].project}/publishSigned")
+    .mkString(";", ";", "")
+)
 
-javaOptions in Test += "-Djava.library.path=/usr/local/lib/python3.6/site-packages/jep"
+lazy val scalaPyNumpy = project.in(file(".")).aggregate(
+  scalaPyNumpyJVM,
+  scalaPyNumpyNative
+).settings(
+  publish := {},
+  publishLocal := {},
+  scalaSource in Compile := baseDirectory.value / "no-src",
+  scalaSource in Test := baseDirectory.value / "no-src"
+)
 
-libraryDependencies += "me.shadaj" %% "scalapy" % "0.2.0"
+lazy val scalaPyNumpyCross = crossProject(JVMPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("."))
+  .settings(
+    name := "scalapy-numpy",
+    libraryDependencies += "me.shadaj" %%% "scalapy-core" % "0.3.0",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0-SNAP8" % Test
+  ).jvmSettings(
+    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
+    fork in Test := true,
+    javaOptions in Test += s"-Djava.library.path=${sys.env.getOrElse("JEP_PATH", "/usr/local/lib/python3.7/site-packages/jep")}"
+  ).nativeSettings(
+    scalaVersion := "2.11.12",
+    libraryDependencies += "com.github.lolgab" %%% "scalacheck" % "1.14.1" % Test,
+    nativeLinkStubs := true,
+    nativeLinkingOptions ++= {
+      import scala.sys.process._
+      "python3-config --ldflags".!!.split(' ').map(_.trim).filter(_.nonEmpty).toSeq
+    }
+  )
+
+lazy val scalaPyNumpyJVM = scalaPyNumpyCross.jvm
+lazy val scalaPyNumpyNative = scalaPyNumpyCross.native

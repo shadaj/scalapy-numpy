@@ -1,39 +1,38 @@
 package me.shadaj.scalapy.numpy
 
-import jep.Jep
 import me.shadaj.scalapy.py
-import me.shadaj.scalapy.py.{ObjectFacade, ObjectReader, ObjectWriter}
+import me.shadaj.scalapy.py.{Reader, Writer}
 
 import scala.reflect.ClassTag
 
-class NumPy(o: py.Object)(implicit jep: Jep) extends ObjectFacade(o) {
-  def asarray[T: ClassTag](s: Seq[T])(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[T] = {
-    toDynamic.asarray(s).as[NDArray[T]]
+@py.native trait NumPy extends py.Object {
+  def asarray[T: ClassTag](s: Seq[T])(implicit writer: Writer[T], reader: Reader[T]): NDArray[T] = {
+    as[py.Dynamic].asarray(s).as[NDArray[T]]
   }
 
-  def matrix[T: ClassTag](s: Seq[T])(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[T] = {
-    toDynamic.matrix(s).as[NDArray[T]]
+  def array[T: ClassTag](s: Seq[Seq[T]])(implicit writer: Writer[Seq[Seq[T]]], reader: Reader[T]): NDArray[NDArray[T]] = {
+    as[py.Dynamic].matrix(s).as[NDArray[NDArray[T]]]
   }
 
-  def resize[T: ClassTag](s: Seq[T], shape: (Int, Int))(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[NDArray[Double]] = {
-    toDynamic.resize(s, shape).as[NDArray[NDArray[Double]]]
+  def matrix[T: ClassTag](s: Seq[T])(implicit writer: Writer[T], reader: Reader[T]): NDArray[T] = {
+    as[py.Dynamic].matrix(s).as[NDArray[T]]
   }
 
-  def ones(size: Int): NDArray[Double] = {
-    native
+  def resize[T: ClassTag](s: Seq[T], shape: (Int, Int))(implicit writer: Writer[T], reader: Reader[T]): NDArray[NDArray[T]] = {
+    as[py.Dynamic].resize(s, shape).as[NDArray[NDArray[T]]]
   }
 
-  def zeroes(size: Int): NDArray[Double] = {
-    native
-  }
+  def ones(size: Int): NDArray[Double] = py.native
 
-  def random: NumPyRandom = native
+  def zeroes(size: Int): NDArray[Double] = py.native
 
-  def float32: NumPyType = native
+  def random: NumPyRandom = py.native
 
-  def linalg: NumPyLinalg = native
+  def float32: NumPyType = py.native
 
-  def clip[T](value: NDArray[T], low: NDArray[T], high: NDArray[T])(implicit writer: ObjectWriter[T], reader: ObjectReader[T]): NDArray[T] = {
-    toDynamic.clip(value, low, high).as[NDArray[T]]
+  def linalg: NumPyLinalg = py.native
+
+  def clip[T](value: NDArray[T], low: NDArray[T], high: NDArray[T])(implicit writer: Writer[T], reader: Reader[T]): NDArray[T] = {
+    as[py.Dynamic].clip(value, low, high).as[NDArray[T]]
   }
 }

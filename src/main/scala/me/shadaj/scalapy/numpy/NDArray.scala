@@ -1,7 +1,7 @@
 package me.shadaj.scalapy.numpy
 
 import me.shadaj.scalapy.py
-import me.shadaj.scalapy.py.{PyValue, Reader, Writer, ValueAndRequestRef}
+import me.shadaj.scalapy.py.{PyValue, Reader, Writer}
 
 class NDArray[T](val value: PyValue)(implicit reader: Reader[T]) extends py.Object with Seq[T] {
   private val origDynamic = this.as[py.Dynamic]
@@ -35,6 +35,6 @@ class NDArray[T](val value: PyValue)(implicit reader: Reader[T]) extends py.Obje
 
 object NDArray {
   implicit def reader[T](implicit reader: Reader[T]): Reader[NDArray[T]] = new Reader[NDArray[T]] {
-    override def read(r: ValueAndRequestRef): NDArray[T] = new NDArray[T](r.value)(reader)
+    override def read(v: PyValue): NDArray[T] = new NDArray[T](v)(reader)
   }
 }

@@ -1,8 +1,14 @@
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
+import scala.sys.process._
 
 organization in ThisBuild := "me.shadaj"
 
-scalaVersion in ThisBuild := "2.12.8"
+lazy val scala211Version = "2.11.12"
+lazy val scala212Version = "2.12.8"
+lazy val scala213Version = "2.13.1"
+lazy val supportedScalaVersions = List(scala212Version, scala213Version)
+
+scalaVersion in ThisBuild := scala213Version
 
 addCommandAlias(
   "publishSignedAll",
@@ -27,14 +33,16 @@ lazy val scalaPyNumpyCross = crossProject(JVMPlatform, NativePlatform)
   .in(file("."))
   .settings(
     name := "scalapy-numpy",
-    libraryDependencies += "me.shadaj" %%% "scalapy-core" % "0.3.0",
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0-SNAP8" % Test
+    libraryDependencies += "me.shadaj" %%% "scalapy-core" % "0.3.0+15-598682f0",
   ).jvmSettings(
+    crossScalaVersions := supportedScalaVersions,
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0" % Test,
     libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
     fork in Test := true,
-    javaOptions in Test += s"-Djava.library.path=${sys.env.getOrElse("JEP_PATH", "/usr/local/lib/python3.7/site-packages/jep")}"
+    javaOptions in Test += s"-Djna.library.path=${"python3-config --prefix".!!.trim}/lib"
   ).nativeSettings(
     scalaVersion := "2.11.12",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0-SNAP8" % Test,
     libraryDependencies += "com.github.lolgab" %%% "scalacheck" % "1.14.1" % Test,
     nativeLinkStubs := true,
     nativeLinkingOptions ++= {

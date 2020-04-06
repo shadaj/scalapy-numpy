@@ -4,7 +4,7 @@ import scala.sys.process._
 organization in ThisBuild := "me.shadaj"
 
 lazy val scala211Version = "2.11.12"
-lazy val scala212Version = "2.12.8"
+lazy val scala212Version = "2.12.10"
 lazy val scala213Version = "2.13.1"
 lazy val supportedScalaVersions = List(scala212Version, scala213Version)
 
@@ -33,7 +33,7 @@ lazy val scalaPyNumpyCross = crossProject(JVMPlatform, NativePlatform)
   .in(file("."))
   .settings(
     name := "scalapy-numpy",
-    libraryDependencies += "me.shadaj" %%% "scalapy-core" % "0.3.0+15-598682f0",
+    libraryDependencies += "me.shadaj" %%% "scalapy-core" % "0.3.0+17-2bfe86de",
   ).jvmSettings(
     crossScalaVersions := supportedScalaVersions,
     libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0" % Test,

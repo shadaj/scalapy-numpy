@@ -26,6 +26,10 @@ class NDArray[T](val value: PyValue)(implicit reader: Reader[T]) extends py.Obje
 
   def astype(newType: NumPyType): NDArray[T] = origDynamic.astype(newType).as[NDArray[T]]
 
+  def reshape(shape: Seq[Int]): NDArray[T] = origDynamic.reshape(shape).as[NDArray[T]]
+
+  def shape: Seq[Int] = origDynamic.shape.as[Seq[Int]]
+
   override def length: Int = py.global.len(this).as[Int]
 
   override def apply(idx: Int): T = origDynamic.arrayAccess(idx).as[T]
